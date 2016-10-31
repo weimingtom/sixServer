@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<beans  
+  xmlns="http://www.springframework.org/schema/beans"  
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+  xmlns:p="http://www.springframework.org/schema/p"
+  xmlns:aop="http://www.springframework.org/schema/aop"
+  xmlns:tx="http://www.springframework.org/schema/tx"  
+  xmlns:context="http://www.springframework.org/schema/context"    
+  xmlns:mvc="http://www.springframework.org/schema/mvc"    
+  xsi:schemaLocation="http://www.springframework.org/schema/beans   
+    http://www.springframework.org/schema/beans/spring-beans-4.0.xsd  
+	  http://www.springframework.org/schema/aop
+    http://www.springframework.org/schema/aop/spring-aop-4.0.xsd 
+    http://www.springframework.org/schema/tx   
+    http://www.springframework.org/schema/tx/spring-tx-4.0.xsd  
+    http://www.springframework.org/schema/context  
+    http://www.springframework.org/schema/context/spring-context-4.0.xsd  
+    http://www.springframework.org/schema/mvc  
+    http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
+  <!-- 扫描有注解的文件-->     
+  <context:component-scan base-package="org.ngame"/>
+  <!-- 打开aop注解 -->
+  <aop:aspectj-autoproxy proxy-target-class="true"/>
+  <!--i18n-->
+  <bean id="messageSource"
+         class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+    <property name="basename" value="messages/messages" />
+    <property name="defaultEncoding" value="utf-8" />
+    <property name="cacheSeconds" value="3600" />
+  </bean> 
+  <!--spring初始化完毕的监听-->
+  <bean class="org.ngame.BeansPostConstructorListerner" />
+</beans>

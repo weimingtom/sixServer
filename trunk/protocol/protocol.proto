@@ -1,0 +1,253 @@
+package protocol;
+
+//协议:6,connector上的验证请求
+message AuthRequest {  
+optional int32 ucenterId=1; // 唯一id
+optional string userCode=2; // 用户名
+optional bool testing=3; // 是否是测试号
+required int32 serverid=4; // 登陆的服务器id
+}
+
+//协议:-6,登陆返回
+message AuthResponse {  
+optional string pid=3; // 用户的id==null
+optional bool success=1; // 是否成功
+optional string info=2; // 错误消息
+}
+
+//协议:7,ping协议，保活
+message Ping {  
+optional int64 time=1; // 客户端的时间
+}
+
+//协议:-7,ping协议的返回
+message Pong {  
+optional int64 time=3; // 服务器的时间
+optional bool success=1; // 是否成功
+optional string info=2; // 错误消息
+}
+
+//协议:8,添加套牌
+message CardGroupRequest {  
+optional string id=1; // 套牌id
+optional string name=2; // name
+optional string baseInitId=3; // 基地id
+repeated string cardIds=4; // 卡牌ids
+}
+
+//协议:20,match
+message MatchRequest {  
+optional string cardGroupId=1; // select the card group
+}
+
+//协议:-20,匹配
+message MatchResponse {  
+optional RoomInfo room=3; // 房间
+optional bool success=1; // 是否成功
+optional string info=2; // 错误消息
+}
+message RoomInfo {  
+optional string id=1; // 房间id
+optional string background=2; // 场景icon
+optional BattleInfo attInfo=3; // 我方信息
+optional BattleInfo defInfo=4; // 敌方信息
+}
+message BattleInfo {  
+optional string pid=1; // 玩家id
+optional string name=2; // 玩家昵称
+optional int32 lv=3; // 玩家等级
+optional string icon=4; // 玩家头像
+optional BaseInfo baseInfo=5; // 基地信息
+optional int32 round=6; // 当前回合数
+optional int32 resource=7; // 资源
+repeated CardInfo handCard=8; // 手牌
+repeated CardInfo tableCard=9; // 桌子上的牌
+repeated CardInfo heapCard=10; // 牌堆里的牌
+repeated CardInfo outCard=11; // 已使用的牌
+}
+message CardInfo {  
+optional string id=1; // id
+optional string name=2; // 名称
+optional int32 blood=3; // 血量
+optional int32 att=4; // 攻击
+optional int32 race=5; // 种族
+optional int32 type=6; // 类型
+repeated string skill=7; // 对应技能
+optional int32 science=8; // 需要科技
+optional int32 cost=9; // 消耗
+optional int32 status=10; // 状态
+optional int32 action=11; // 行动力
+repeated string buff=12; // buff
+optional string art=13; // 美术资源
+}
+message BaseInfo {  
+optional string id=1; // 基地id
+optional string name=2; // 名称
+optional int32 blood=3; // 血量
+optional int32 cost=4; // 消耗
+optional int32 science=5; // 科技等级
+optional string skill=6; // 技能
+optional string art=7; // 美术资源
+optional string desc=8; // 描述
+}
+
+//协议:21,出牌
+message EjectionRequest {  
+optional string roomId=1; // 房间id
+optional int32 launch=2; // 出牌索引
+optional string cardId=3; // 出牌id
+optional int32 position=4; // 摆放位置
+optional int32 side=5; // 我方:0 敌方:1
+optional int32 target=6; // 目标
+}
+
+//协议:-21,出牌
+message EjectionResponse {  
+optional string pid=3; // 用户id
+optional string cardId=4; // 卡牌id
+optional int32 position=5; // 摆放位置
+optional int32 target=6; // 目标
+repeated SkillInfo skill=7; // 技能
+optional bool success=1; // 是否成功
+optional string info=2; // 错误消息
+}
+message SkillInfo {  
+optional string id=1; // 技能id
+repeated string target=2; // 受影响的卡牌id
+}
+
+//协议:22,base lv
+message BaseLvRequest {  
+optional string roomId=1; // roomId
+}
+
+//协议:-22,基地升级
+message BaseLvResponse {  
+optional string pid=3; // 玩家id
+optional int32 resource=4; // 资源数
+optional int32 baseLv=5; // base lv
+optional bool success=1; // 是否成功
+optional string info=2; // 错误消息
+}
+
+//协议:23,卡牌行动
+message ActionRequest {  
+optional string roomId=1; // 房间id
+optional int32 launch=2; // 出牌索引
+optional string cardId=3; // 出牌id
+optional int32 side=4; // 我方:0 敌方:1
+optional int32 target=5; // 目标
+}
+
+//协议:-23,卡牌行动
+message ActionResponse {  
+optional string pid=3; // 用户id
+optional string cardId=4; // 卡牌id
+optional int32 target=5; // 目标
+repeated SkillInfo skill=6; // 技能
+optional bool success=1; // 是否成功
+optional string info=2; // 错误消息
+}
+
+//协议:24,base action
+message BaseActionRequest {  
+optional string roomId=1; // roomId
+optional int32 side=2; // 我方:0 敌方:1
+optional int32 target=3; // target
+}
+
+//协议:-24,基地行动
+message BaseActionResponse {  
+optional string pid=3; // 用户id
+repeated SkillInfo skill=4; // 技能
+optional bool success=1; // 是否成功
+optional string info=2; // 错误消息
+}
+
+//协议:25,roundOver
+message RoundRequest {  
+optional string roomId=1; // roomId
+}
+
+//协议:-25,roundOver
+message RoundResponse {  
+optional string roomId=3; // 房间id
+optional RoundInfo nri=4; // 回合信息
+optional bool success=1; // 是否成功
+optional string info=2; // 错误消息
+}
+message RoundInfo {  
+optional string attId=1; // 攻击方id
+optional int32 round=2; // 回合数
+optional int32 resouce=3; // 资源数
+repeated CardInfo add=4; // 新抓到的卡牌
+repeated string action=5; // 需要加行动力的卡牌id,攻击方
+repeated string remove=6; // 需要移除buff的卡牌id,防守方
+}
+
+//协议:26,回合开始选择随机手牌
+message RandomAgainRequest {  
+optional string roomId=1; // 房间id
+repeated int32 indexs=2; // 要随机掉的牌
+}
+
+//协议:-26,回合开始选择随机手牌
+message RandomAgainResponse {  
+optional string roomId=3; // roomId
+optional string pid=4; // pid
+repeated CardInfo hand=5; // 手牌信息
+optional bool success=1; // 是否成功
+optional string info=2; // 错误消息
+}
+
+//协议:27,我选择死亡
+message SurrenderRequest {  
+optional string roomId=1; // roomId
+}
+
+//协议:-30,套牌推送
+message CardGroupNotify {  
+optional string pid=3; // 玩家id
+repeated CardGroupInfo cardGroup=4; // 套牌组
+optional bool success=1; // 是否成功
+optional string info=2; // 错误消息
+}
+message CardGroupInfo {  
+optional string id=1; // id
+optional string pid=2; // 属于哪个玩家
+optional string name=3; // 卡组名称
+optional string baseInitId=4; // 基地
+repeated string cardIds=5; // 卡牌组
+}
+
+//协议:-32,战斗结果
+message BattleOverNotify {  
+optional string roomId=3; // 房间id
+optional bool flag=4; // 胜利true 失败false
+optional bool success=1; // 是否成功
+optional string info=2; // 错误消息
+}
+
+//协议:-801,飘字
+message MsgNotify {  
+optional EMsg type=3; // 消息类型
+optional string msg=4; // 消息
+optional bool success=1; // 是否成功
+optional string info=2; // 错误消息
+}
+enum EMsg {  
+Form=1; // 弹框
+Fly=2; // 飘字
+Marquee=3; // 跑马灯
+}
+ 
+//协议:9999,这是一条服务器的转发
+message OnlineRequest {  
+optional string pid=1;
+}
+
+//协议:-9999,这是一条服务器的转发
+message OnlineResponse {  
+repeated string pids=1; // online pids
+}
+

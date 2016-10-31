@@ -1,0 +1,51 @@
+#listContainer {
+	width: 1200px;
+	margin: 0px auto;
+	margin-top: 30px;
+}
+
+#dateChooser {
+	width: 1200px;
+	margin: 0px auto;
+	margin-top: 30px;
+}
+
+table{
+	border-collapse:collapse;
+}
+
+.log_title {
+	display: block;
+	height: 24px;
+	line-height: 24px;
+	text-decoration: underline;;
+	clear: both;
+}
+
+.log_content_item {
+	display: block;
+	width: 200px;
+	height: 14px;
+	line-height: 14px;
+	text-indent: 3px;
+	overflow: hidden;
+	float: left;
+}
+
+#searchContainer {
+	width: 1200px;
+	margin: 0px auto;
+	margin-top: 30px;
+}
+
+.inputClass{
+	width:450px;
+	height:21px;
+	font-size:20px;
+	margin-left:10px;
+}
+.inputClass1{
+	width:450px;
+	height:21px;
+	margin-left:10px;
+}

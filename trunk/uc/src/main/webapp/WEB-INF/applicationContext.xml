@@ -1,0 +1,170 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!-- was: <?xml version="1.0" encoding="UTF-8"?> -->
+<beans  
+  xmlns="http://www.springframework.org/schema/beans"  
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+  xmlns:p="http://www.springframework.org/schema/p"
+  xmlns:aop="http://www.springframework.org/schema/aop"
+  xmlns:tx="http://www.springframework.org/schema/tx"  
+  xmlns:context="http://www.springframework.org/schema/context"    
+  xmlns:mvc="http://www.springframework.org/schema/mvc"    
+  xsi:schemaLocation="http://www.springframework.org/schema/beans   
+    http://www.springframework.org/schema/beans/spring-beans-4.0.xsd  
+	  http://www.springframework.org/schema/aop
+    http://www.springframework.org/schema/aop/spring-aop-4.0.xsd 
+    http://www.springframework.org/schema/tx   
+    http://www.springframework.org/schema/tx/spring-tx-4.0.xsd  
+    http://www.springframework.org/schema/context  
+    http://www.springframework.org/schema/context/spring-context-4.0.xsd  
+    http://www.springframework.org/schema/mvc  
+    http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
+	
+	
+  <!-- 扫描有注解的文件，只扫描了dao层，其他的注解比如controller使用各自所属的servlet配置文件打开扫描-->     
+  <context:component-scan base-package="org.ocean.dao"/>
+  <context:component-scan base-package="org.ocean.service"/>
+  <!--加载属性配置文件-->
+  <bean id="propertyConfigurer" 
+        class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="locations">
+      <list>
+        <value>/WEB-INF/ali.properties</value>
+        <value>/WEB-INF/wpay.properties</value>
+        <value>/WEB-INF/dataSource.properties</value>
+      </list>
+    </property>
+  </bean>
+  <!--ali pay的配置-->
+  <bean id="aliconfig" class="org.ocean.controller.pay.ali.AlipayConfig">
+    <property name="partner" value="${ali.partner}" />
+    <property name="seller_id" value="${ali.seller_id}" />
+    <property name="seller_email" value="${ali.seller_email}" />
+    <property name="key" value="${ali.key}" />
+    <property name="show_url" value="${ali.show_url}" />
+    <property name="notifyUrl" value="${ali.notifyUrl}" />
+  </bean>
+  <!--微信支付的配置-->
+  <bean id="wpconfig" class="org.ocean.controller.pay.weixin.utils.Config"> 
+    <property name="appid" value="${appid}" />
+    <property name="mch_id" value="${mch_id}" />
+    <property name="key" value="${key}" />
+    <property name="notify_url" value="${notify_url}" />
+  </bean>
+  <!--数据源的配置-->  
+  <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+    <property name="driverClassName" value="${jdbc.driverClassName}" />
+    <!-- 基本属性 url、user、password -->
+    <property name="url" value="${jdbc.url}" />
+    <property name="username" value="${jdbc.username}" />
+    <property name="password" value="${jdbc.password}" />
+    <!-- 配置初始化大小、最小、最大 -->
+    <property name="maxActive" value="40" />
+    <property name="initialSize" value="1" />
+    <property name="minIdle" value="1" />
+    <!-- maxWait获取连接等待超时的时间 -->
+    <property name="maxWait" value="30000" />
+    <!-- timeBetweenEvictionRunsMillis间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+    <property name="timeBetweenEvictionRunsMillis" value="60000" />
+    <!-- minEvictableIdleTimeMillis一个连接在池中最小空闲的时间，单位是毫秒-->
+    <property name="minEvictableIdleTimeMillis" value="300000" />
+    <property name="validationQuery" value="SELECT 'z'" />
+    <property name="testWhileIdle" value="true" />
+    <property name="testOnBorrow" value="false" />
+    <property name="testOnReturn" value="false" />
+    <property name="filters" value="stat" />  
+    <property name="removeAbandoned" value="true" /> <!-- 打开removeAbandoned功能 -->
+    <property name="removeAbandonedTimeout" value="60" /> <!-- 180秒，也就是3分钟 -->
+    <property name="logAbandoned" value="true" />
+  </bean>
+        
+        
+  <!--hibernate的sessionFactory-->
+  <bean id="sessionFactory" 
+        class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+    <property name="dataSource" ref="dataSource" />
+    <property name="packagesToScan">
+      <list>
+        <value>org.ocean.domain</value>
+      </list>
+    </property>
+    <property name="hibernateProperties">
+      <props>
+        <prop key="hibernate.hbm2ddl.auto">update</prop>
+        <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+        <prop key="hibernate.show_sql">true</prop>
+        <!--
+        <prop key="hibernate.current_session_context_class">org.springframework.orm.hibernate4.SpringSessionContext</prop>
+        -->       
+        <prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</prop>  
+        <prop key="hibernate.cache.use_query_cache">true</prop>  
+        <prop key="hibernate.jdbc.batch_size">50</prop>  
+        <prop key="hibernate.cache.use_second_level_cache">true</prop>  
+      </props>
+    </property>
+  </bean>
+  
+  <!-- 配置声明式事务管理（采用注解的方式） -->
+  <bean id="txManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+    <property name="sessionFactory" ref="sessionFactory"></property>
+    <property name="globalRollbackOnParticipationFailure" value="false" />
+  </bean>
+  <tx:annotation-driven transaction-manager="txManager"/>
+  
+  <!--定义Autowired自动注入bean-->
+  <bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>   
+  <!--messages-->
+  <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+    <property name="basename">
+      <value>org.ocean.i18n.messages</value>
+    </property>
+    <property name="defaultEncoding">
+      <value>UTF-8</value>
+    </property>
+    <property name="useCodeAsDefaultMessage">
+      <value>true</value>
+    </property>
+  </bean>
+  <!-- 基于Cookie的本地化解析器 -->
+  <bean id="localeResolver" class="org.springframework.web.servlet.i18n.CookieLocaleResolver">
+    <property name="cookieMaxAge" value="604800"/>
+    <property name="defaultLocale" value="zh_CN"/>
+    <property name="cookieName" value="Language"/>
+  </bean>
+  <!--druid监控-->
+  <bean id="druid-stat-interceptor"
+        class="com.alibaba.druid.support.spring.stat.DruidStatInterceptor">
+  </bean>
+  <bean id="druid-stat-pointcut" class="org.springframework.aop.support.JdkRegexpMethodPointcut"
+        scope="prototype">
+    <property name="patterns">
+      <list>
+        <value>org.ocean.service.*</value>
+        <value>org.ocean.dao.*</value>
+      </list>
+    </property>
+  </bean>
+  <aop:config>
+    <aop:advisor advice-ref="druid-stat-interceptor"
+                 pointcut-ref="druid-stat-pointcut" />
+  </aop:config>
+  <!--spring上下文-->
+  <bean class = "org.ocean.Spring"/>
+  <!--spring初始化完毕的监听-->
+  <bean class="org.ocean.BeansPostConstructorListerner" />
+  <!-- SpringMVC上传文件时，需要配置MultipartResolver处理器 -->  
+  <bean id="multipartResolver"  
+        class="org.springframework.web.multipart.commons.CommonsMultipartResolver">  
+    <property name="defaultEncoding" value="UTF-8" />  
+    <!-- 指定所上传文件的总大小不能超过10485760000B。注意maxUploadSize属性的限制不是针对单个文件，而是所有文件的容量之和 -->  
+    <property name="maxUploadSize" value="10485760000"></property>  
+    <property name="maxInMemorySize" value="40960"></property>  
+  </bean>  
+  <!--拦截器-->
+  <mvc:interceptors>  
+    <mvc:interceptor>    
+      <!-- 匹配的是url路径， 如果不配置或/**,将拦截所有的Controller -->  
+      <mvc:mapping path="/*.man" />
+      <bean class="org.ocean.auth.LoginInterceptor"/>  
+    </mvc:interceptor> 
+  </mvc:interceptors>
+</beans>

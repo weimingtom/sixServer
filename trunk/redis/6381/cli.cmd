@@ -1,0 +1,1 @@
+..\redis-cli.exe -p 6379 -a a77af61dd9f8e6c974b9f092032998d0

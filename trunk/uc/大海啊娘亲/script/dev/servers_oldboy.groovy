@@ -1,0 +1,35 @@
+/**
+ * 配置服务器列表
+ */
+//---------------------------------front-----------------------------//
+connector=//连接器
+[
+  "type":"connector",
+	"autoTrans":true,
+    "class":"org.ngame.server.connector.ConnectorServer",
+    "servers":[
+    ["name":"connector0","ip":"127.0.0.1","port":8887,"clientIp":"127.0.0.1","clientPort":4887,"frontend":true,"concurrency":3,"load":10]
+  ]
+];
+//---------------------------------backend---------------------------//
+home=//家园
+[
+    "type":"home",
+	  "autoTrans":false,
+      "class":"org.ngame.server.BaseServer",
+      "servers":[
+    ["name":"home0","ip":"127.0.0.1","port":8886,"concurrency":3,"load":10]
+  ]
+];
+chat=//聊天
+[
+    "type":"chat",
+	  "autoTrans":false,
+      "class":"org.ngame.server.BaseServer",
+      "servers":[
+    ["name":"chat0","ip":"127.0.0.1","port":8881,"concurrency":3,"load":10]
+  ]
+];
+cluster=[connector];//集群所包含的所有服务器,单服结构的只需要配置connector
+service=[1,2,3];//可服务的对象(可为1,2,3区提供服务)
+riverPort=1106;//river服务器的端口

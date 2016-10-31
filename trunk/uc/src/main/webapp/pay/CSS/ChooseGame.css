@@ -1,0 +1,20 @@
+.order-app{margin-right: -16px; *width: 736px;}
+.order-app li{width: 182px; margin-right: 16px; margin-bottom: 50px;}
+.order-app a.btn-block{
+    width: 184px;
+    border: 2px solid #e6e6e6;
+    height: 120px;
+    border-radius: 4px;
+}
+#ttmxOrder{
+    background: url(../Images/v4/game1.png) no-repeat;
+}
+#glgsOrder{
+    background: url(../Images/v4/game2.png) no-repeat;
+}
+#hyzgOrder{
+    background: url(../Images/v4/game3.png) no-repeat;
+}
+.order-app .btn-block span{visibility: hidden; display: block; height: 25px; margin-top: 95px; background: #ff6600; color: #ffffff; border-radius: 0 0 2px 2px; text-align: center;}
+.order-app .btn-block:hover{border-color: #ff6600;}
+.order-app .btn-block:hover span{ visibility: visible;}
